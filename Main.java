@@ -1,5 +1,6 @@
 
 package StudentDatabase.gitRepo.StudentDatabaseSystem;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -11,8 +12,8 @@ import javax.swing.*;
 public class Main {
     JFrame f;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    int width = (int) screenSize.getWidth();
-    int height = (int) screenSize.getHeight();
+    int Screenwidth = (int) screenSize.getWidth();
+    int ScreenHeight = (int) screenSize.getHeight();
     boolean proceed = false;
     
     
@@ -32,7 +33,7 @@ public class Main {
         f.setLayout(null);
         f.setVisible(true);
         f.setSize(600, 450);
-        f.setLocation(width/2 - 300, height/2 - 250);
+        f.setLocation(Screenwidth/2 - 300, ScreenHeight/2 - 250);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        f.getContentPane().setBackground(new Color(254, 234, 250));
 
@@ -49,6 +50,7 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // code to create a jframe that will get student data and add it to student database
+                new AddStudent();
             }
         });
         
@@ -78,7 +80,7 @@ public class Main {
         f.setUndecorated(true);
         f.setSize(250, 100);
         f.getContentPane().setBackground(Color.WHITE);
-        f.setLocation((width/2) - 125, (height/2) - 80);
+        f.setLocation((Screenwidth/2) - 125, (ScreenHeight/2) - 80);
         
         f.setLayout(null);
         JLabel l = new JLabel("Enter password : ");
