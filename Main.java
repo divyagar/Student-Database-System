@@ -15,6 +15,8 @@ public class Main {
     int Screenwidth = (int) screenSize.getWidth();
     int ScreenHeight = (int) screenSize.getHeight();
     boolean proceed = false;
+    int width = 700;
+    int height = 600;
     
     
     Main(){
@@ -32,7 +34,7 @@ public class Main {
         f = new JFrame();
         f.setLayout(null);
         f.setVisible(true);
-        f.setSize(600, 450);
+        f.setSize(width, height);
         f.setLocation(Screenwidth/2 - 300, ScreenHeight/2 - 250);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        f.getContentPane().setBackground(new Color(254, 234, 250));
@@ -50,7 +52,10 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // code to create a jframe that will get student data and add it to student database
-                new AddStudent();
+                new AddStudent(f.getLocation());
+                f.dispose();
+                
+                
             }
         });
         
