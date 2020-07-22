@@ -1,4 +1,8 @@
 package StudentDatabase.gitRepo.StudentDatabaseSystem;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+import java.sql.*;
+import java.sql.DriverManager;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -8,6 +12,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
@@ -30,9 +35,9 @@ public class AddStudent extends JFrame implements ActionListener{
     JComboBox countryList, stateList, cityList;
     JButton submit;
     
-    int rollNoAns, enrollmentAns, phoneAns, percentageAns;
-    long aadharAns;
-    String nameAns, fatherAns, motherAns, dobAns, emailAns, genderAns;
+    int rollNoAns;
+    float percentageAns;
+    String nameAns, fatherAns, motherAns, dobAns, emailAns, genderAns, enrollmentAns, aadharAns, phoneAns;
     String countryAns, stateAns, cityAns, addressAns;
     boolean alteringStateList = false;
 
@@ -255,56 +260,56 @@ public class AddStudent extends JFrame implements ActionListener{
         else
             genderAns = "Female";
             
-        String aadharAnsString = AadharCard.getText();
-        String enrollAnsString = Enrollment.getText();
+        aadharAns = AadharCard.getText();
+        enrollmentAns = Enrollment.getText();
         addressAns = Address.getText();
         countryAns = (String) countryList.getSelectedItem();
         stateAns = (String) stateList.getSelectedItem();
-        cityAns = (String) stateList.getSelectedItem();
-        String phoneAnsString = PhoneNo.getText();
+        cityAns = (String) cityList.getSelectedItem();
+        phoneAns = PhoneNo.getText();
         String percentAnsString = Percentage.getText();
 
-//        if(nameAns.trim().equals("") || rollNoStringAns.trim().equals("") || fatherAns.trim().equals("") || motherAns.trim().equals("") || dobAns.trim().equals("") || emailAns.trim().equals("") || aadharAnsString.trim().equals("") || enrollAnsString.trim().equals("") || addressAns.trim().equals("") || countryAns.trim().equals("") || stateList.isEnabled() == false || cityList.isEnabled() == false || phoneAnsString.trim().equals("") || percentAnsString.trim().equals("")){
-//            JOptionPane.showMessageDialog(rootPane, "Fill all details");
-//            return;
-//        }
+        if(nameAns.trim().equals("") || rollNoStringAns.trim().equals("") || fatherAns.trim().equals("") || motherAns.trim().equals("") || dobAns.trim().equals("") || emailAns.trim().equals("") || aadharAns.trim().equals("") || enrollmentAns.trim().equals("") || addressAns.trim().equals("") || countryAns.trim().equals("") || stateList.isEnabled() == false || cityList.isEnabled() == false || phoneAns.trim().equals("") || percentAnsString.trim().equals("")){
+            JOptionPane.showMessageDialog(rootPane, "Fill all details");
+            return;
+        }
 
         String emailRegEx = "^[a-zA-Z0-9-_.]+@[a-zA-Z0-9-_.]+\\.[a-zA-Z]{2,6}$";
         Pattern pattern = Pattern.compile(emailRegEx);
         Matcher matcher = pattern.matcher(emailAns);
-//        if(!matcher.find()){
-//            JOptionPane.showMessageDialog(rootPane, "Wrong email address");
-//            return;
-//        }
-//
-//        pattern = Pattern.compile("[\\d]{16}");
-//        matcher = pattern.matcher(aadharAnsString);
-//        if(!matcher.find()){
-//            JOptionPane.showMessageDialog(rootPane, "Aadhar number should be 16 digits long");
-//            return;
-//        }
-//        
-//        pattern = Pattern.compile("[A-Z]{2}[\\d]{6}");
-//        matcher = pattern.matcher(enrollAnsString);
-//        if(!matcher.find()){
-//            JOptionPane.showMessageDialog(rootPane, "Wrong format of enrollment number(it shoudl contain two uppercase letters followed by 6 digits with no spece in between)");
-//            return;
-//        }
-//        
-//        pattern = Pattern.compile("[\\d]{10}");
-//        matcher = pattern.matcher(phoneAnsString);
-//        if(!matcher.find()){
-//            JOptionPane.showMessageDialog(rootPane, "phone number should be 10 digits long");
-//            return;
-//        }
+        if(!matcher.find()){
+            JOptionPane.showMessageDialog(rootPane, "Wrong email address");
+            return;
+        }
+
+        pattern = Pattern.compile("[\\d]{16}");
+        matcher = pattern.matcher(aadharAns);
+        if(!matcher.find()){
+            JOptionPane.showMessageDialog(rootPane, "Aadhar number should be 16 digits long");
+            return;
+        }
         
-//        pattern = Pattern.compile("^[0-9][0-9]?(\\.)?[0-9]+$|^100[.0]+$");
-//        matcher = pattern.matcher(percentAnsString);
-//        System.out.println(percentAnsString);
-//        if(!matcher.find()){
-//            JOptionPane.showMessageDialog(rootPane, "Invalid percentage");
-//            return;
-//        }
+        pattern = Pattern.compile("[A-Z]{2}[\\d]{6}");
+        matcher = pattern.matcher(enrollmentAns);
+        if(!matcher.find()){
+            JOptionPane.showMessageDialog(rootPane, "Wrong format of enrollment number(it shoudl contain two uppercase letters followed by 6 digits with no spece in between)");
+            return;
+        }
+        
+        pattern = Pattern.compile("^[\\d]{10}$");
+        matcher = pattern.matcher(phoneAns);
+        if(!matcher.find()){
+            JOptionPane.showMessageDialog(rootPane, "phone number should be 10 digits long");
+            return;
+        }
+        
+        pattern = Pattern.compile("^[0-9][0-9]?(\\.)?[0-9]+$|^100[.0]+$");
+        matcher = pattern.matcher(percentAnsString);
+        System.out.println(percentAnsString);
+        if(!matcher.find()){
+            JOptionPane.showMessageDialog(rootPane, "Invalid percentage");
+            return;
+        }
         
         pattern = Pattern.compile("^[0-9]{4}-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$");
         matcher = pattern.matcher(dobAns);
@@ -313,21 +318,97 @@ public class AddStudent extends JFrame implements ActionListener{
             return;
         }
         
-        
         try{
             rollNoAns = Integer.parseInt(rollNoStringAns);
-            aadharAns = Long.parseLong(AadharCard.getText());
-            enrollmentAns = Integer.parseInt(Enrollment.getText());
-            phoneAns = Integer.parseInt(PhoneNo.getText());
-            percentageAns = Integer.parseInt(Percentage.getText());
+            percentageAns = Float.parseFloat(Percentage.getText());
         }
         catch(Exception e){
             JOptionPane.showMessageDialog(rootPane, "Please add number where numbers are required");
             return;
         }
         
+        insertData();
         
-//        System.out.println(nameAns + " " + rollNoAns + " " + fatherAns + " " + motherAns + " " + dobAns+ " " + emailAns + " " + aadharAns + " " + enrollmentAns + " " + addressAns + " " + countryAns + " " + stateAns + " " + cityAns + " " + phoneAns + " " + percentageAns);
+        
+//        System.out.println(nameAns + " " + rollNoAns + " " + fatherAns + " " + motherAns + " " + dobAns + " " + emailAns + " " + aadharAns + " " + enrollmentAns + " " + addressAns + " " + countryAns + " " + stateAns + " " + cityAns + " " + phoneAns + " " + percentageAns);
+    }
+    
+    private void insertData(){
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            String link = "jdbc:mysql://localhost:3308/StudentDatabase?autoReconnect=true&useSSL=false";
+            String username = "root";
+            String password = "";
+            Connection con = (Connection) DriverManager.getConnection(link, username, password);
+            
+            // first check for existing unique data
+            
+            Statement stmt = con.createStatement();
+            String sql = "select * from student where RollNo = " + rollNoAns;
+            ResultSet results = stmt.executeQuery(sql);
+            results.last();
+            if(results.getRow() > 0){
+                JOptionPane.showMessageDialog(rootPane, "Entered roll no. already exists");
+                return;
+            }
+            
+            sql = "select * from student where email = '" + emailAns + "'";
+            results = stmt.executeQuery(sql);
+            results.last();
+            if(results.getRow() > 0){
+                JOptionPane.showMessageDialog(rootPane, "Entered email already exists");
+                return;
+            }
+            
+            sql = "select * from student where AadharCard = '" + aadharAns + "'";
+            results = stmt.executeQuery(sql);
+            results.last();
+            if(results.getRow() > 0){
+                JOptionPane.showMessageDialog(rootPane, "Entered aadhar card no. already exists");
+                return;
+            }
+            
+            sql = "select * from student where Enrollment = '" + enrollmentAns + "'";
+            results = stmt.executeQuery(sql);
+            results.last();
+            if(results.getRow() > 0){
+                JOptionPane.showMessageDialog(rootPane, "Entered enrollment no. already exists");
+                return;
+            }
+            
+            
+            // insertion of data if duplicate data is not present
+            
+            String query = "insert into student values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            PreparedStatement statement = (PreparedStatement) con.prepareStatement(query);
+
+            
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date date = format.parse(dobAns);
+            java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+            
+            statement.setString(1, nameAns);
+            statement.setInt(2, rollNoAns);
+            statement.setString(3, fatherAns);
+            statement.setString(4, motherAns);
+            statement.setDate(5, sqlDate);
+            statement.setString(6, emailAns);
+            statement.setString(7, genderAns);
+            statement.setString(8, aadharAns);
+            statement.setString(9, enrollmentAns);
+            statement.setString(10, addressAns);
+            statement.setString(11, countryAns);
+            statement.setString(12, stateAns);
+            statement.setString(13, cityAns);
+            statement.setString(14, phoneAns);
+            statement.setFloat(15, percentageAns);
+            
+            statement.execute();
+            con.close();
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(rootPane, "Some error occurred");
+        }
     }
     
     private boolean checkDate(String date){
