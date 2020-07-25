@@ -47,9 +47,6 @@ public class AddStudent extends JFrame implements ActionListener{
     
     private void createFrame(Point loc){
         setTitle("Add new Student");
-        setVisible(true);
-        setLocation(loc);
-        setSize(width, height);
         setLayout(null);
         
         // comment following line before running main program
@@ -229,10 +226,15 @@ public class AddStudent extends JFrame implements ActionListener{
         submit.setBounds(300, 500, 100, 30);
         add(submit);
         submit.addActionListener(this);
+        
+        
+        setVisible(true);
+        setLocation(loc);
+        setSize(width, height);
     }
     
     public static void main(String args[]){
-//        new AddStudent();
+        new AddStudent(new Point(200, 100));
     }
 
     @Override
@@ -305,7 +307,6 @@ public class AddStudent extends JFrame implements ActionListener{
         
         pattern = Pattern.compile("^[0-9][0-9]?(\\.)?[0-9]+$|^100[.0]+$");
         matcher = pattern.matcher(percentAnsString);
-        System.out.println(percentAnsString);
         if(!matcher.find()){
             JOptionPane.showMessageDialog(rootPane, "Invalid percentage");
             return;
@@ -382,7 +383,6 @@ public class AddStudent extends JFrame implements ActionListener{
             String query = "insert into student values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement statement = (PreparedStatement) con.prepareStatement(query);
 
-            
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             java.util.Date date = format.parse(dobAns);
             java.sql.Date sqlDate = new java.sql.Date(date.getTime());
