@@ -52,7 +52,7 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // code to create a jframe that will get student data and add it to student database
-                new AddStudent(f.getLocation());
+                new AddStudent(f.getLocation(), f.getWidth(), f.getHeight());
                 f.dispose();
             }
         });
@@ -63,7 +63,7 @@ public class Main {
         fetchStudentBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new FetchData(f.getLocation());
+                new FetchData(f.getLocation(), f.getWidth(), f.getHeight());
                 f.dispose();
             }
         });

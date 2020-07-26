@@ -21,19 +21,21 @@ public class FetchData extends JFrame implements ActionListener{
     int Screenwidth = (int) screenSize.getWidth();
     int ScreenHeight = (int) screenSize.getHeight();
     
-    int width = 700;
-    int height = 600;
+    int width, height;
     
-    int rollNo;
-    JLabel title, rollno;
-    JButton getByRollNo;
+    String rollNo;
+    String Name;
+    JLabel title, rollno, name;
+    JButton getByRollNo, getByName;
     JPanel main;
     JTextField byRollNo, byName;
     
     ResultSet results;
-    boolean resultExists = false;
+    boolean resultExists = false, getRollNumber = false;
     
-    public FetchData(Point loc) {
+    public FetchData(Point loc, int w, int h) {
+        width = w;
+        height = h;
         createFrame(loc);
     }
     
@@ -55,7 +57,7 @@ public class FetchData extends JFrame implements ActionListener{
         main.setLocation(50, 140);
 
         rollno = new JLabel("Roll No.");
-        rollno.setBounds(30, 30, 100, 30);
+        rollno.setBounds(30, 25, 100, 30);
         main.add(rollno);
 
         byRollNo = new JTextField(20);
@@ -67,31 +69,54 @@ public class FetchData extends JFrame implements ActionListener{
         main.add(getByRollNo);
         getByRollNo.addActionListener(this);
         
+        name = new JLabel("Name");
+        name.setBounds(30, 95, 100, 30);
+        main.add(name);
+
+        byName = new JTextField(20);
+        byName.setBounds(140, 100, 200, 20);
+        main.add(byName);
+        
+        getByName = new JButton("Search");
+        getByName.setBounds(440, 95, 80, 30);
+        main.add(getByName);
+        getByName.addActionListener(this);
+        
         
         
         add(main);
         
         setTitle("Fetch information");
-        setVisible(true);
         setLocation(loc);
         setSize(width, height);
+        setVisible(true);
         
     }
     
-    private void fetchDataFromDatabase(){
+    private void fetchDataFromDatabase(String data){
         try{
             Class.forName("com.mysql.jdbc.Driver");
             String link = "jdbc:mysql://localhost:3308/StudentDatabase?autoReconnect=true&useSSL=false";
             String username = "root";
             String password = "";
             Connection con = DriverManager.getConnection(link, username, password);
+            String sql = "";
+            if(getRollNumber)
+                sql = "select * from student where RollNo = " + data;
             
-            String sql = "select * from student where RollNo = " + rollNo;
+            else
+                sql = "select * from student where Name = " + data;
+            
             Statement stmt = con.createStatement();
             results = stmt.executeQuery(sql);
             
             if(!results.isBeforeFirst()){
-                JOptionPane.showMessageDialog(rootPane, "No student from Provided roll no.");
+                if(getRollNumber){
+                    JOptionPane.showMessageDialog(rootPane, "No student from Provided roll no.");
+                    getRollNumber = false;
+                }
+                else
+                    JOptionPane.showMessageDialog(rootPane, "No student from Provided Name");
                 return;
             }
             else{
@@ -106,25 +131,31 @@ public class FetchData extends JFrame implements ActionListener{
     
     
     public static void main(String args[]){
-//        new FetchData(new Point(300, 100));
+        new FetchData(new Point(300, 100), 700, 600);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == getByRollNo){
-            rollNo = Integer.parseInt(byRollNo.getText());
-            fetchDataFromDatabase(); 
+            rollNo = byRollNo.getText();
+            getRollNumber = true;
+            fetchDataFromDatabase(rollNo); 
+            getRollNumber = false;
+        }
+        else{
+            Name = byName.getText();
+            fetchDataFromDatabase(Name);
+        }
             
             try {
                 if(resultExists){
-                    ShowFetchedData dataObj = new ShowFetchedData(getLocation(), results);
+                    ShowFetchedData dataObj = new ShowFetchedData(getLocation(), results, getWidth(), getHeight());
                     dispose();
                 }
             }
             catch (SQLException ex) {
                 JOptionPane.showMessageDialog(rootPane, "Some error occurred");
             }
-        }
     }
     
 }

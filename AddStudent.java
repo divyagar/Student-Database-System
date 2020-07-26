@@ -21,8 +21,7 @@ public class AddStudent extends JFrame implements ActionListener{
     int Screenwidth = (int) screenSize.getWidth();
     int ScreenHeight = (int) screenSize.getHeight();
     
-    int width = 700;
-    int height = 600;
+    int width, height;
     int leftAlingFirstCol = 50, leftAlignSecondCol = 170;
     int labelWidth = 110, textFieldWidth = 150;
     
@@ -41,7 +40,9 @@ public class AddStudent extends JFrame implements ActionListener{
     String countryAns, stateAns, cityAns, addressAns;
     boolean alteringStateList = false;
 
-    public AddStudent(Point loc) {
+    public AddStudent(Point loc, int w, int h) {
+        width = w;
+        height = h;
         createFrame(loc);    
     }
     
@@ -234,7 +235,7 @@ public class AddStudent extends JFrame implements ActionListener{
     }
     
     public static void main(String args[]){
-        new AddStudent(new Point(200, 100));
+//        new AddStudent(new Point(200, 100));
     }
 
     @Override
@@ -403,8 +404,10 @@ public class AddStudent extends JFrame implements ActionListener{
             statement.setString(14, phoneAns);
             statement.setFloat(15, percentageAns);
             
+            System.out.println(statement.toString());
             statement.execute();
             con.close();
+            JOptionPane.showMessageDialog(rootPane, "Data has been submitted");
         }
         catch(Exception e){
             JOptionPane.showMessageDialog(rootPane, "Some error occurred");

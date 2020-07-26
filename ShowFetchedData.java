@@ -14,8 +14,7 @@ public class ShowFetchedData extends JFrame {
     int Screenwidth = (int) screenSize.getWidth();
     int ScreenHeight = (int) screenSize.getHeight();
     
-    int width = 700;
-    int height = 600;
+    int width, height;
     int RollNo;
     
     JLabel title, name, rollno, fathername, mothername, dob, email, gender, aadharcard, enrollment, address;
@@ -26,8 +25,9 @@ public class ShowFetchedData extends JFrame {
     
     ResultSet result;
 
-    public ShowFetchedData(Point loc, ResultSet results) throws SQLException {
-//        public ShowFetchedData(Point loc) throws SQLException {
+    public ShowFetchedData(Point loc, ResultSet results, int w, int h) throws SQLException {
+        width = w;
+        height = h;
         result = results;
         createFrame(loc);
     }
@@ -179,6 +179,10 @@ public class ShowFetchedData extends JFrame {
         percentageAns.setBounds(200, 450, 500, 20);
         percentageAns.setFont(new Font("", Font.PLAIN, 12));
         add(percentageAns);
+        
+        JScrollPane scroll = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+//        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        add(scroll);
         
         while(result.next()){
             String ans = result.getString(1);
