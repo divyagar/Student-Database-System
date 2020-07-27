@@ -12,6 +12,7 @@ import java.awt.event.FocusListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.*;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -91,6 +92,7 @@ public class FetchData extends JFrame implements ActionListener{
         setSize(width, height);
         setVisible(true);
         
+        
     }
     
     private void fetchDataFromDatabase(String data){
@@ -105,7 +107,7 @@ public class FetchData extends JFrame implements ActionListener{
                 sql = "select * from student where RollNo = " + data;
             
             else
-                sql = "select * from student where Name = " + data;
+                sql = "select * from student where Name = '" + data + "'";
             
             Statement stmt = con.createStatement();
             results = stmt.executeQuery(sql);
@@ -124,7 +126,8 @@ public class FetchData extends JFrame implements ActionListener{
             }
         }
         catch(Exception e){
-            JOptionPane.showMessageDialog(rootPane, "Some error occurred");
+//            System.out.println(e);
+            JOptionPane.showMessageDialog(rootPane, "Some error occurred while connecting to database");
         }
     }
     
@@ -141,11 +144,6 @@ public class FetchData extends JFrame implements ActionListener{
             getRollNumber = true;
             fetchDataFromDatabase(rollNo); 
             getRollNumber = false;
-        }
-        else{
-            Name = byName.getText();
-            fetchDataFromDatabase(Name);
-        }
             
             try {
                 if(resultExists){
@@ -156,6 +154,16 @@ public class FetchData extends JFrame implements ActionListener{
             catch (SQLException ex) {
                 JOptionPane.showMessageDialog(rootPane, "Some error occurred");
             }
+        }
+        else{
+            Name = byName.getText();
+            fetchDataFromDatabase(Name);
+            if(resultExists){
+                new ShowNames(getLocation(), getWidth(), getHeight(), results);
+                dispose();
+            }
+            
+        }
     }
     
 }
