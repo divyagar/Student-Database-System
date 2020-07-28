@@ -13,6 +13,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
@@ -38,11 +40,20 @@ public class AddStudent extends JFrame implements ActionListener{
     float percentageAns;
     String nameAns, fatherAns, motherAns, dobAns, emailAns, genderAns, enrollmentAns, aadharAns, phoneAns;
     String countryAns, stateAns, cityAns, addressAns;
-    boolean alteringStateList = false;
+    boolean alteringStateList = false, modifying = false;
+    ResultSet result;
 
     public AddStudent(Point loc, int w, int h) {
         width = w;
         height = h;
+        createFrame(loc);    
+    }
+    
+    public AddStudent(Point loc, int w, int h, ResultSet result) {
+        width = w;
+        height = h;
+        this.result = result;
+        modifying = true;
         createFrame(loc);    
     }
     
@@ -228,6 +239,44 @@ public class AddStudent extends JFrame implements ActionListener{
         add(submit);
         submit.addActionListener(this);
         
+        // If data is to be modified then this section will enter existing data into textfields
+        if(modifying){
+            try {
+                result.next();
+                Name.setText(result.getString(1));
+                RollNo.setText(result.getString(2));
+                FatherName.setText(result.getString(3));
+                MotherName.setText(result.getString(4));
+                Dob.setText(result.getString(5));
+                Email.setText(result.getString(6));
+                System.out.println("everything ok");
+                String gend = result.getString(7);
+                System.out.println(gend);
+                if(gend.equals("Male")){
+                    male.setSelected(true);
+                }
+                else{
+                    female.setSelected(true);
+                }
+                
+                System.out.println("everything ok 2");
+                AadharCard.setText(result.getString(8));
+                Enrollment.setText(result.getString(9));
+                Address.setText(result.getString(10));
+                System.out.println("everything ok 3");
+                countryList.setSelectedItem(result.getString(11));
+                stateList.setSelectedItem(result.getString(12));
+                cityList.setSelectedItem(result.getString(13));
+                System.out.println("everything ok 4");
+                PhoneNo.setText(result.getString(14));
+                Percentage.setText(result.getString(15));
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(rootPane, "Some error occurred in modifying");
+            }
+        }
+        
+        // entering data to be modified ends here
+        
         
         setVisible(true);
         setLocation(loc);
@@ -348,45 +397,81 @@ public class AddStudent extends JFrame implements ActionListener{
             Statement stmt = con.createStatement();
             String sql = "select * from student where RollNo = " + rollNoAns;
             ResultSet results = stmt.executeQuery(sql);
-            results.last();
-            if(results.getRow() > 0){
-                JOptionPane.showMessageDialog(rootPane, "Entered roll no. already exists");
-                return;
+            if(results.isBeforeFirst()){
+                results.next();
+                if(!modifying){
+                    JOptionPane.showMessageDialog(rootPane, "Entered roll no. already exists");
+                    return;
+                }
+                
+                else if(!results.getString(2).equals(result.getString(2))){
+                    JOptionPane.showMessageDialog(rootPane, "Entered roll no. already exists");
+                    return;
+                }
             }
             
             sql = "select * from student where email = '" + emailAns + "'";
             results = stmt.executeQuery(sql);
-            results.last();
-            if(results.getRow() > 0){
-                JOptionPane.showMessageDialog(rootPane, "Entered email already exists");
-                return;
+            if(results.isBeforeFirst()){
+                results.next();
+                if(!modifying){
+                    JOptionPane.showMessageDialog(rootPane, "Entered email already exists");
+                    return;
+                }
+                
+                else if(!results.getString(6).equals(result.getString(6))){
+                    JOptionPane.showMessageDialog(rootPane, "Entered email already exists");
+                    return;
+                }
             }
             
             sql = "select * from student where AadharCard = '" + aadharAns + "'";
             results = stmt.executeQuery(sql);
-            results.last();
-            if(results.getRow() > 0){
-                JOptionPane.showMessageDialog(rootPane, "Entered aadhar card no. already exists");
-                return;
+            if(results.isBeforeFirst()){
+                results.next();
+                if(!modifying){
+                    JOptionPane.showMessageDialog(rootPane, "Entered aadhar card no.s already exists");
+                    return;
+                }
+                
+                else if(!results.getString(8).equals(result.getString(8))){
+                    JOptionPane.showMessageDialog(rootPane, "Entered aadhar card no. already exists");
+                    return;
+                }
             }
             
             sql = "select * from student where Enrollment = '" + enrollmentAns + "'";
             results = stmt.executeQuery(sql);
-            results.last();
-            if(results.getRow() > 0){
-                JOptionPane.showMessageDialog(rootPane, "Entered enrollment no. already exists");
-                return;
+            if(results.isBeforeFirst()){
+                results.next();
+                if(!modifying){
+                    JOptionPane.showMessageDialog(rootPane, "Entered enrollment no.s already exists");
+                    return;
+                }
+                
+                else if(!results.getString(9).equals(result.getString(9))){
+                    JOptionPane.showMessageDialog(rootPane, "Entered enrollment no. already exists");
+                    return;
+                }
             }
             
             
             // insertion of data if duplicate data is not present
             
-            String query = "insert into student values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            PreparedStatement statement = (PreparedStatement) con.prepareStatement(query);
-
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             java.util.Date date = format.parse(dobAns);
             java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+            
+            String query = "";
+            
+            if(modifying){
+                query = "update student set name = ?, RollNo = ?, FatherName = ?, Mothername = ?, dob = ?, email = ?, gender = ?, AadharCard = ?, Enrollment = ?, Address = ?, country = ?, state = ?, city = ?, PhoneNo = ?, percentage = ? where RollNo = " + result.getString(2);
+            }
+            else
+                query = "insert into student values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            
+            PreparedStatement statement = (PreparedStatement) con.prepareStatement(query);
+
             
             statement.setString(1, nameAns);
             statement.setInt(2, rollNoAns);
@@ -404,12 +489,25 @@ public class AddStudent extends JFrame implements ActionListener{
             statement.setString(14, phoneAns);
             statement.setFloat(15, percentageAns);
             
-            System.out.println(statement.toString());
-            statement.execute();
+//            System.out.println(statement.toString());
+            int done = statement.executeUpdate();
             con.close();
-            JOptionPane.showMessageDialog(rootPane, "Data has been submitted");
+            if(modifying){
+                if(done > 0)
+                    JOptionPane.showMessageDialog(rootPane, "Data has been updated");
+                else
+                    JOptionPane.showMessageDialog(rootPane, "Error while updating data");
+            }
+                
+            else{
+                if(done > 0)
+                    JOptionPane.showMessageDialog(rootPane, "Data has been submitted");
+                else
+                    JOptionPane.showMessageDialog(rootPane, "Error while submitting data");
+            }
         }
         catch(Exception e){
+            System.out.println(e);
             JOptionPane.showMessageDialog(rootPane, "Some error occurred");
         }
     }

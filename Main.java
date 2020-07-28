@@ -9,6 +9,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 public class Main {
     JFrame f;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -17,6 +20,8 @@ public class Main {
     boolean proceed = false;
     int width = 700;
     int height = 600;
+    ResultSet result;
+    boolean deleting = false;
     
     
     Main(){
@@ -33,18 +38,20 @@ public class Main {
         
         f = new JFrame();
         f.setLayout(null);
-        f.setVisible(true);
-        f.setSize(width, height);
-        f.setLocation(Screenwidth/2 - 300, ScreenHeight/2 - 250);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        f.getContentPane().setBackground(new Color(254, 234, 250));
 
         JLabel title = new JLabel("Student Database System", SwingConstants.CENTER);
-        title.setBounds(50, 40, 500, 80);
-        title.setFont(new Font("", Font.PLAIN, 30));        
+        title.setBounds(50, 40, 600, 80);
+        title.setFont(new Font("", Font.PLAIN, 30));
+        
+        JPanel mainButtons = new JPanel();
+        mainButtons.setBounds(20, 150, 650, 350);
+//        mainButtons.setBackground(Color.red);
+        mainButtons.setLayout(null);
+        f.add(mainButtons);
         
         JButton addStudentBtn = new JButton("Add new Student");
-        addStudentBtn.setBounds(50, 160, 200, 150);
+        addStudentBtn.setBounds(100, 20, 200, 120);
         addStudentBtn.setFont(new Font("", Font.PLAIN, 18));
         addStudentBtn.setBackground(Color.WHITE);
         
@@ -57,9 +64,12 @@ public class Main {
             }
         });
         
+        mainButtons.add(addStudentBtn);
+        
         JButton fetchStudentBtn = new JButton("Fetch Student data");
-        fetchStudentBtn.setBounds(320, 160, 200, 150);
-        fetchStudentBtn.setFont(new Font("", Font.PLAIN, 18));   
+        fetchStudentBtn.setBounds(350, 20, 200, 120);
+        fetchStudentBtn.setFont(new Font("", Font.PLAIN, 18));  
+        fetchStudentBtn.setBackground(Color.WHITE); 
         fetchStudentBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,15 +78,106 @@ public class Main {
             }
         });
         
-        fetchStudentBtn.setBackground(Color.WHITE);
+        mainButtons.add(fetchStudentBtn);
+        
+        JButton modifyStudentBtn = new JButton("Modify Student data");
+        modifyStudentBtn.setBounds(100, 180, 200, 110);
+        modifyStudentBtn.setFont(new Font("", Font.PLAIN, 18));   
+        modifyStudentBtn.setBackground(Color.WHITE);modifyStudentBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String ans = JOptionPane.showInputDialog("Enter roll Number : ");
+                if((ans.trim() != "") && (ans != null)){
+                    try {
+                        int rollno = Integer.parseInt(ans);
+                        DatabaseWork(rollno);
+                        System.out.println(result.isBeforeFirst());
+                        if(result.isBeforeFirst()){
+                            new AddStudent(f.getLocation(), f.getWidth(), f.getHeight(), result);
+                            f.dispose();
+                        }
+                        else{
+                            JOptionPane.showMessageDialog(f, "No student from provided roll no.");
+                        }
+                    } catch (SQLException ex) {
+                        System.out.println("Some error Occurred");
+                    }
+                }
+            }
+        });
+        
+        mainButtons.add(modifyStudentBtn);
+        
+        JButton deleteStudentBtn = new JButton("Delete Student data");
+        deleteStudentBtn.setBounds(350, 180, 200, 110);
+        deleteStudentBtn.setFont(new Font("", Font.PLAIN, 18));   
+        deleteStudentBtn.setBackground(Color.WHITE);
+        deleteStudentBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String ans = JOptionPane.showInputDialog("Enter roll Number : ");
+                if((ans.trim() != "") && (ans != null)){
+                    int rollno = Integer.parseInt(ans);
+                    deleting = true;
+                    DatabaseWork(rollno);
+                    deleting = false;
+                }
+                
+            }
+        });
+        
+        
+        mainButtons.add(deleteStudentBtn);
+        
 
         f.add(title);
-        f.add(addStudentBtn);
-        f.add(fetchStudentBtn);
+//        f.add(addStudentBtn);
+//        f.add(fetchStudentBtn);
 //        f.add(storing);
 //        f.add(fetching);
         
+        f.setVisible(true);
+        f.setSize(width, height);
+        f.setLocation(Screenwidth/2 - 300, ScreenHeight/2 - 250);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
+    }
+    
+    private void DatabaseWork(int rollno){
+        System.out.println("Inside function");
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            String link = "jdbc:mysql://localhost:3308/StudentDatabase?autoReconnect=true&useSSL=false";
+            String username = "root";
+            String password = "";
+            com.mysql.jdbc.Connection con = (com.mysql.jdbc.Connection) DriverManager.getConnection(link, username, password);
+            
+            Statement stmt = con.createStatement();
+            String sql = "select * from student where RollNo = " + rollno;
+            
+            result = stmt.executeQuery(sql);
+            
+            if(deleting){
+                if(result.isBeforeFirst()){
+                    Statement statement = con.createStatement();
+                    int done = statement.executeUpdate("delete from student where RollNo = " + rollno);
+                    System.out.println(done);
+                    if(done > 0){
+                        JOptionPane.showMessageDialog(f, "Student data has been deleted");
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(f, "Error while deleting student data");
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(f, "No student from provided roll no.");
+                }
+            }
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(f, "Error while connecting to database");
+        }
+        System.out.println("outside function");
     }
     
     public void authenticate(){
