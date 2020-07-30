@@ -27,7 +27,7 @@ public class FetchData extends JFrame implements ActionListener{
     String rollNo;
     String Name;
     JLabel title, rollno, name;
-    JButton getByRollNo, getByName;
+    JButton getByRollNo, getByName, back;
     JPanel main;
     JTextField byRollNo, byName;
     
@@ -83,11 +83,15 @@ public class FetchData extends JFrame implements ActionListener{
         main.add(getByName);
         getByName.addActionListener(this);
         
+        back = new JButton("Back");
+        back.setBounds(0, 400, 70, 30);
+        add(back);
+        back.addActionListener(this);
         
         
         add(main);
         
-        setTitle("Fetch information");
+        setTitle("Student Database System");
         setLocation(loc);
         setSize(width, height);
         setVisible(true);
@@ -139,7 +143,11 @@ public class FetchData extends JFrame implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == getByRollNo){
+        if(e.getSource() == back){
+            new Main();
+            dispose();
+        }
+        else if(e.getSource() == getByRollNo){
             rollNo = byRollNo.getText();
             getRollNumber = true;
             fetchDataFromDatabase(rollNo); 

@@ -3,13 +3,15 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.*;
 import java.sql.DriverManager;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.*;
-public class ShowFetchedData extends JFrame {
+public class ShowFetchedData extends JFrame implements ActionListener{
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     int Screenwidth = (int) screenSize.getWidth();
     int ScreenHeight = (int) screenSize.getHeight();
@@ -22,6 +24,7 @@ public class ShowFetchedData extends JFrame {
     
     JLabel nameAns, rollnoAns, fathernameAns, mothernameAns, dobAns, emailAns, genderAns, aadharcardAns, enrollmentAns, addressAns;
     JLabel countryAns, stateAns, cityAns, phonenoAns, percentageAns;
+    JButton back;
     
     ResultSet result;
 
@@ -180,9 +183,10 @@ public class ShowFetchedData extends JFrame {
         percentageAns.setFont(new Font("", Font.PLAIN, 12));
         add(percentageAns);
         
-        JScrollPane scroll = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-//        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        add(scroll);
+        back = new JButton("Back");
+        back.setBounds(0, 500, 70, 30);
+        add(back);
+        back.addActionListener(this);
         
         while(result.next()){
             String ans = result.getString(1);
@@ -217,8 +221,7 @@ public class ShowFetchedData extends JFrame {
             percentageAns.setText(ans);
         }
         
-        
-        setTitle("Student information");
+        setTitle("Student Database System");
         setVisible(true);
         setLocation(loc);
         setSize(width, height);
@@ -229,6 +232,14 @@ public class ShowFetchedData extends JFrame {
     
     public static void main(String args[]) throws SQLException{
 //        new ShowFetchedData(new Point(300, 100));
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == back){
+            new FetchData(getLocation(), getWidth(), getHeight());
+            dispose();
+        }
     }
     
 }

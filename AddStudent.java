@@ -34,7 +34,7 @@ public class AddStudent extends JFrame implements ActionListener{
     JRadioButton male, female;
     ButtonGroup genders;
     JComboBox countryList, stateList, cityList;
-    JButton submit;
+    JButton submit, back;
     
     int rollNoAns;
     float percentageAns;
@@ -58,7 +58,7 @@ public class AddStudent extends JFrame implements ActionListener{
     }
     
     private void createFrame(Point loc){
-        setTitle("Add new Student");
+        setTitle("Student Database System");
         setLayout(null);
         
         // comment following line before running main program
@@ -239,6 +239,12 @@ public class AddStudent extends JFrame implements ActionListener{
         add(submit);
         submit.addActionListener(this);
         
+        back = new JButton("Back");
+        back.setBounds(0, 500, 70, 30);
+        add(back);
+        back.addActionListener(this);
+        
+        
         // If data is to be modified then this section will enter existing data into textfields
         if(modifying){
             try {
@@ -249,9 +255,7 @@ public class AddStudent extends JFrame implements ActionListener{
                 MotherName.setText(result.getString(4));
                 Dob.setText(result.getString(5));
                 Email.setText(result.getString(6));
-                System.out.println("everything ok");
                 String gend = result.getString(7);
-                System.out.println(gend);
                 if(gend.equals("Male")){
                     male.setSelected(true);
                 }
@@ -259,15 +263,12 @@ public class AddStudent extends JFrame implements ActionListener{
                     female.setSelected(true);
                 }
                 
-                System.out.println("everything ok 2");
                 AadharCard.setText(result.getString(8));
                 Enrollment.setText(result.getString(9));
                 Address.setText(result.getString(10));
-                System.out.println("everything ok 3");
                 countryList.setSelectedItem(result.getString(11));
                 stateList.setSelectedItem(result.getString(12));
                 cityList.setSelectedItem(result.getString(13));
-                System.out.println("everything ok 4");
                 PhoneNo.setText(result.getString(14));
                 Percentage.setText(result.getString(15));
             } catch (SQLException ex) {
@@ -289,7 +290,11 @@ public class AddStudent extends JFrame implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == countryList){
+        if(e.getSource() == back){
+            new Main();
+            dispose();
+        }
+        else if(e.getSource() == countryList){
             countryClicked();
         }
         else if(e.getSource() == stateList && alteringStateList == false){
@@ -379,7 +384,6 @@ public class AddStudent extends JFrame implements ActionListener{
         }
         
         insertData();
-        
         
 //        System.out.println(nameAns + " " + rollNoAns + " " + fatherAns + " " + motherAns + " " + dobAns + " " + emailAns + " " + aadharAns + " " + enrollmentAns + " " + addressAns + " " + countryAns + " " + stateAns + " " + cityAns + " " + phoneAns + " " + percentageAns);
     }
@@ -507,7 +511,7 @@ public class AddStudent extends JFrame implements ActionListener{
             }
         }
         catch(Exception e){
-            System.out.println(e);
+//            System.out.println(e);
             JOptionPane.showMessageDialog(rootPane, "Some error occurred");
         }
     }

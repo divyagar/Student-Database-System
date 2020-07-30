@@ -28,6 +28,7 @@ public class ShowNames extends JFrame implements ActionListener {
     public void CreateFrame(){
         try {
             setLayout(null);
+            setTitle("Student Database System");
 //        getContentPane().setLayout(null);
 
             JPanel mainPanel = new JPanel();

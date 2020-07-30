@@ -13,11 +13,12 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 public class Main {
-    JFrame f;
+    static JFrame f;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     int Screenwidth = (int) screenSize.getWidth();
     int ScreenHeight = (int) screenSize.getHeight();
-    boolean proceed = false;
+    
+    static boolean proceed = false;
     int width = 700;
     int height = 600;
     ResultSet result;
@@ -25,14 +26,6 @@ public class Main {
     
     
     Main(){
-        // First authentication : If user entered 1234 it will be given permission to proceed further
-        
-//        authenticate();
-//        while(true){
-//            System.out.print("");
-//            if(proceed == true)
-//                break;
-//        }
 
         // this code will execute only after user authenticated itself
         
@@ -80,18 +73,17 @@ public class Main {
         
         mainButtons.add(fetchStudentBtn);
         
-        JButton modifyStudentBtn = new JButton("Modify Student data");
-        modifyStudentBtn.setBounds(100, 180, 200, 110);
+        JButton modifyStudentBtn = new JButton("Update Student data");
+        modifyStudentBtn.setBounds(100, 180, 200, 120);
         modifyStudentBtn.setFont(new Font("", Font.PLAIN, 18));   
         modifyStudentBtn.setBackground(Color.WHITE);modifyStudentBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String ans = JOptionPane.showInputDialog("Enter roll Number : ");
-                if((ans.trim() != "") && (ans != null)){
+                if((ans != null) && (ans.trim() != "")){
                     try {
                         int rollno = Integer.parseInt(ans);
                         DatabaseWork(rollno);
-                        System.out.println(result.isBeforeFirst());
                         if(result.isBeforeFirst()){
                             new AddStudent(f.getLocation(), f.getWidth(), f.getHeight(), result);
                             f.dispose();
@@ -100,7 +92,7 @@ public class Main {
                             JOptionPane.showMessageDialog(f, "No student from provided roll no.");
                         }
                     } catch (SQLException ex) {
-                        System.out.println("Some error Occurred");
+                        JOptionPane.showMessageDialog(f, "Some error occurred");
                     }
                 }
             }
@@ -109,14 +101,14 @@ public class Main {
         mainButtons.add(modifyStudentBtn);
         
         JButton deleteStudentBtn = new JButton("Delete Student data");
-        deleteStudentBtn.setBounds(350, 180, 200, 110);
+        deleteStudentBtn.setBounds(350, 180, 200, 120);
         deleteStudentBtn.setFont(new Font("", Font.PLAIN, 18));   
         deleteStudentBtn.setBackground(Color.WHITE);
         deleteStudentBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String ans = JOptionPane.showInputDialog("Enter roll Number : ");
-                if((ans.trim() != "") && (ans != null)){
+                if( (ans != null) && (ans.trim() != "")){
                     int rollno = Integer.parseInt(ans);
                     deleting = true;
                     DatabaseWork(rollno);
@@ -126,25 +118,18 @@ public class Main {
             }
         });
         
-        
         mainButtons.add(deleteStudentBtn);
-        
 
         f.add(title);
-//        f.add(addStudentBtn);
-//        f.add(fetchStudentBtn);
-//        f.add(storing);
-//        f.add(fetching);
         
         f.setVisible(true);
         f.setSize(width, height);
-        f.setLocation(Screenwidth/2 - 300, ScreenHeight/2 - 250);
+        f.setLocation(Screenwidth/2 - 300, ScreenHeight/2 - 350);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
     }
     
     private void DatabaseWork(int rollno){
-        System.out.println("Inside function");
         try{
             Class.forName("com.mysql.jdbc.Driver");
             String link = "jdbc:mysql://localhost:3308/StudentDatabase?autoReconnect=true&useSSL=false";
@@ -161,7 +146,6 @@ public class Main {
                 if(result.isBeforeFirst()){
                     Statement statement = con.createStatement();
                     int done = statement.executeUpdate("delete from student where RollNo = " + rollno);
-                    System.out.println(done);
                     if(done > 0){
                         JOptionPane.showMessageDialog(f, "Student data has been deleted");
                     }
@@ -177,15 +161,13 @@ public class Main {
         catch(Exception e){
             JOptionPane.showMessageDialog(f, "Error while connecting to database");
         }
-        System.out.println("outside function");
     }
     
-    public void authenticate(){
+    public static void authenticate(){
         f = new JFrame();
         f.setUndecorated(true);
         f.setSize(250, 100);
-        f.getContentPane().setBackground(Color.WHITE);
-        f.setLocation((Screenwidth/2) - 125, (ScreenHeight/2) - 80);
+        f.setLocation(500, 300);
         
         f.setLayout(null);
         JLabel l = new JLabel("Enter password : ");
@@ -210,7 +192,6 @@ public class Main {
                 if(password.equals(""))
                     System.exit(0);
                 else if(password.equals("1234")){
-                    System.out.println("correct");
                     f.dispose();
                     proceed = true;
                 }
@@ -235,9 +216,16 @@ public class Main {
     }
     
     public static void main(String args[]){
-//        authenticate();
+        // First authentication : If user entered 1234 it will be given permission to proceed further
+        
+        authenticate();
+        while(true){
+            System.out.print("");
+            if(proceed == true)
+                break;
+        }
+
         new Main();
-//        new AddStudent();
     }
     
 }
