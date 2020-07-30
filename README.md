@@ -1,3 +1,5 @@
-# Student-Database-System
+# Student Database System
 
-An ongoing project which will handle student data. Admin can add data of a new student or fetch data of a particular student.
+<p> 
+A desktop application that manages information of students. Only admin can add or change information of a student. Admin can add information of new student, read information of existing student, update and delete information of a student.
+ </p>
